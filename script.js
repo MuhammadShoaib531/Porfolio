@@ -86,6 +86,76 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// Character-by-character typewriter effect
+function typeWriter(element, text, delay = 100, callback = null) {
+    let charIndex = 0;
+    
+    element.classList.add('typing');
+    element.textContent = '';
+    
+    function typeNextChar() {
+        if (charIndex < text.length) {
+            element.textContent += text.charAt(charIndex);
+            charIndex++;
+            
+            // Add slight variation in typing speed for more realistic effect
+            let nextDelay = delay;
+            if (text.charAt(charIndex - 1) === ' ') {
+                nextDelay = delay * 2; // Pause slightly longer after spaces
+            } else if (text.charAt(charIndex - 1) === ',' || text.charAt(charIndex - 1) === '.') {
+                nextDelay = delay * 3; // Pause longer after punctuation
+            }
+            
+            setTimeout(typeNextChar, nextDelay);
+        } else {
+            element.classList.remove('typing');
+            if (callback) callback(); // Call callback when typing is complete
+        }
+    }
+    
+    setTimeout(typeNextChar, 500);
+}
+
+// Looping typewriter animation
+function startTypewriterLoop() {
+    const typewriterElement = document.querySelector('.typewriter');
+    const subtitleElement = document.querySelector('.typewriter-subtitle');
+    
+    if (typewriterElement && subtitleElement) {
+        const text = typewriterElement.getAttribute('data-text');
+        const subtitleText = subtitleElement.getAttribute('data-text');
+        
+        function startLoop() {
+            // Clear both texts first
+            typewriterElement.textContent = '';
+            subtitleElement.textContent = '';
+            
+            // Type the main title
+            typeWriter(typewriterElement, text, 120, () => {
+                // After title completes, wait 800ms then start subtitle
+                setTimeout(() => {
+                    typeWriter(subtitleElement, subtitleText, 80, () => {
+                        // After subtitle completes, wait 3 seconds then restart
+                        setTimeout(() => {
+                            startLoop(); // Restart the entire loop
+                        }, 3000);
+                    });
+                }, 800);
+            });
+        }
+        
+        startLoop(); // Start the initial loop
+    }
+}
+
+// Initialize typewriter effect
+const typewriterElement = document.querySelector('.typewriter');
+const subtitleElement = document.querySelector('.typewriter-subtitle');
+
+if (typewriterElement && subtitleElement) {
+    startTypewriterLoop();
+}
+
 // Hero section animations - fade in and slide up effect
 const heroTitle = document.querySelector('.hero-title');
 const heroDescription = document.querySelector('.hero-description');
